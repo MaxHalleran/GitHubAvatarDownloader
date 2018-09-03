@@ -5,6 +5,8 @@
 const request = require('request');
 const fs = require('fs');
 
+console.log('Welcome to the GitHub Avatar Downloader!');
+
 // We need to take in the name of a repo user and their repository directly from the command line
 
 // Then we need to send a GET request
