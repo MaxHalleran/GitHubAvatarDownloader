@@ -1,8 +1,7 @@
 const request = require('request');
 const fs = require('fs');
 const token = require('./secrets.js');
-
-console.log('Welcome to the GitHub Avatar Downloader!');
+const args = process.argv;
 
 function getRepoContributors(repoOwner, repoName, cb) {
 
@@ -20,25 +19,28 @@ function getRepoContributors(repoOwner, repoName, cb) {
 
 }
 
-// //function check if the directory exists and if not will create it
-// let checkDirectory = function(directory, callback) {
-//   fs.stat(directory, function(err, stats) {
-//     //Check if the error defined and the error code is "not exists"
-//     if (err && err.errno === 34) {
-//       //creates the directory
-//       fs.mkdir(directory, callback);
-//     } else {
-//       callback(err);
-//     }
-//   });
-// }
+function checkDirectory(directory, callback) {
+  fs.stat(directory, function(err, stats) {
+    //Check if error defined and the error code is "not exists"
+    if (err && err.errno === 34) {
+      //Create the directory, call the callback.
+      fs.mkdir(directory, callback);
+    } else {
+      //just in case there was a different error:
+      callback(err);
+    }
+  });
+}
 
 function downloadImageByURL(url, filePath) {
 
-  // //check to make sure the directory exists. If not, create it
-  // checkDirectory(filePath.substring(0, 9), function(err, stats) {
-  //   return;
-  // });
+  checkDirectory('./avatars', function(error) {
+    if(error) {
+      console.log("oh no!!!", error);
+    } else {
+      //Carry on.
+    }
+  });
 
   //Get request at https://sytantris.github.io/http-examples/future.jpg
   request.get(url)
@@ -59,15 +61,19 @@ function downloadImageByURL(url, filePath) {
 
          //When the image has been downloaded, let the user know
          .on('end', function () {
-          console.log("Download Complete.")
+          console.log("Download Complete.");
          })
 
          //create a file with the image inside of it
          .pipe(fs.createWriteStream(filePath));
 }
 
-getRepoContributors("jquery", "jquery", function(err, result) {
+getRepoContributors(args[2], args[3], function(err, result) {
+  if (process.argv.length < 4) {
+    console.log("Error. Please specify both the user and the repo");
+    return;
+  } else {
   result.forEach( function (contributor) {
     downloadImageByURL(contributor.avatar_url, './avatars/' + contributor.login + '.jpg');
   });
-});
+}});
