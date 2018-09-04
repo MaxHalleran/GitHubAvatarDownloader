@@ -2,10 +2,15 @@
 const dotenv = require('dotenv').config;
 const request = require('request');
 const fs = require('fs');
-const token = require('./secrets.js');
 const args = process.argv;
 
 function getRepoContributors(repoOwner, repoName, cb) {
+
+  if (process.argv.length < 4) {
+    console.log("Error. Please specify both the user and the repo");
+    return;
+  }
+
   var options = {
     url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
     headers: {
@@ -19,28 +24,15 @@ function getRepoContributors(repoOwner, repoName, cb) {
   });
 }
 
-// function checkDirectory(directory, callback) {
-//   fs.stat(directory, function(err, stats) {
-//     //Check if error defined and the error code is "not exists"
-//     if (err && err.errno === 34) {
-//       //Create the directory, call the callback.
-//       fs.mkdir(directory);
-//     } else {
-//       //just in case there was a different error:
-//       callback(err);
-//     }
-//   });
-// }
+function checkDirectory(directory) {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory);
+  }
+}
 
 function downloadImageByURL(url, filePath) {
 
-  // checkDirectory('./avatars', function(error) {
-  //   if(error) {
-  //     console.log("oh no!!!", error);
-  //   } else {
-  //     //Carry on.
-  //   }
-  // });
+  checkDirectory('./avatars');
 
   //Get request at https://sytantris.github.io/http-examples/future.jpg
   request.get(url)
@@ -67,13 +59,9 @@ function downloadImageByURL(url, filePath) {
          .pipe(fs.createWriteStream(filePath));
 }
 
-//
 getRepoContributors(args[2], args[3], function(err, result) {
-  if (process.argv.length < 4) {
-    console.log("Error. Please specify both the user and the repo");
-    return;
-  } else {
-  result.forEach( function (contributor) {
-    downloadImageByURL(contributor.avatar_url, './avatars/' + contributor.login + '.jpg');
-  });
-}});
+  console.log(result);
+  //result.forEach( function (contributor) {
+    //downloadImageByURL(contributor.avatar_url, './avatars/' + contributor.login + '.jpg');
+//  });
+});
