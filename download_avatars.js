@@ -1,8 +1,11 @@
 //Initialize all the modules and information needed throughout the program
-const dotenv = require('dotenv').config;
+var Tdotenv = require('dotenv').config();
+const dotenv = JSON.stringify(process.env.GITHUB_TOKEN);
 const request = require('request');
 const fs = require('fs');
 const args = process.argv;
+console.log(dotenv);
+
 
 function getRepoContributors(repoOwner, repoName, cb) {
 
@@ -15,7 +18,7 @@ function getRepoContributors(repoOwner, repoName, cb) {
     url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
     headers: {
       'User-Agent': 'request',
-      'Authorization': dotenv.GITHUB_TOKEN
+      'Authorization': dotenv
     }
   };
 
@@ -61,7 +64,7 @@ function downloadImageByURL(url, filePath) {
 
 getRepoContributors(args[2], args[3], function(err, result) {
   console.log(result);
-  //result.forEach( function (contributor) {
-    //downloadImageByURL(contributor.avatar_url, './avatars/' + contributor.login + '.jpg');
-//  });
+  result.forEach( function (contributor) {
+    downloadImageByURL(contributor.avatar_url, './avatars/' + contributor.login + '.jpg');
+ });
 });
