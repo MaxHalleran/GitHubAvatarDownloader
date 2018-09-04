@@ -2,7 +2,7 @@
   "name": "githubavatardownloader",
   "version": "1.0.0",
   "description": "A small package to download the avatars of github contributors",
-  "main": "downloadAvatars.js",
+  "main": "download_avatars.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
